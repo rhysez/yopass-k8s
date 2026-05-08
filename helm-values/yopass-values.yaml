@@ -1,0 +1,23 @@
+replicaCount: 2
+
+database:
+  type: redis
+
+redis:
+  enabled: false
+
+extraEnvVars:
+  - name: REDIS_URL
+    value: redis-master:6379
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+service:
+  type: ClusterIP
+  port: 80
