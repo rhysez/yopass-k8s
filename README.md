@@ -50,7 +50,7 @@ Once the cluster is created by kind using `kind create cluster`, service definit
 ## Bare chart workflow (no helm)
 The charts found in `k8s/` do not rely on helm templates, instead they contain the full definition for the service. In order to add these services to our cluster, we just need to run `kubectl apply -f k8s/<service_name.yaml>`. This will update the cluster with that service. 
 
-For example, running `kubectl apply -f k8s/ingress.yaml` will publish the ingress service to the cluster, allowing us to access the application externally via https://yopass.radioco.local.
+For example, running `kubectl apply -f k8s/ingress.yaml` will publish an NGINX ingress service to the cluster, allowing us to access the application externally via https://yopass.radioco.local.
 
 
 
