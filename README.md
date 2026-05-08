@@ -17,7 +17,7 @@ There are a few services being used in this project that I wanted to provide exp
 
 - `kind` is being used to create and destroy the local K8S cluster
 - `kubectl` is being used to interact with the cluster, deploy new container definitions and for general observability.
-- `helm` is being used as a K8S package manager, allowing us to pull helm charts from a remote repository. This has allowed me to reduce the amount of YAML I'm writing for container definitions. Values files still exist for these in the project so that we can override certain fields. Any fields that do not need to change are not included.
+- `helm` is being used as a K8S package manager, allowing us to pull helm manifests (aka 'values' files) from a remote repository. This has allowed me to reduce the amount of YAML I'm writing for container definitions. Values files still exist for these in the project so that we can override certain fields. Any fields that do not need to change are not included.
 
 Here is a very simple communication workflow, shown below
 
@@ -40,15 +40,15 @@ The cluster contains **worker nodes**. These are essentially individual machines
 The individual application processes (e.g. yopass, redis) run in **pods**. In this project, the pods are auto-scaled up to a max of 5 replicas when needed.
 
 ## Helm workflow
-If I wanted to, I could have opted out of using helm and just created the full charts myself, however I thought it would be better to use helm.
+The `helm-values/` directory contains service manifests for services that are installed into the cluster using Helm. These manifests only contain the fields that we want to explicitly override when adding the service to the cluster.
 
 Once the cluster is created by kind using `kind create cluster`, service definitions need to be added to the cluster, otherwise the cluster doesn't have anything to run. The workflow goes as follows:
 
 1. Add the repo that contains the service you need. For example, in this project we are using the redis service, which is found within the 'bitnami' repo. So we run `helm repo add bitnami https://charts.bitnami.com/bitnami` to get access to the services under the repo.
-2. Install and create the full chart for the service using `helm install redis bitnami/redis -f helm-values/redis-values.yaml`. This updates the chart with any overridden fields found in `redis-values.yaml`. When executing this command, we are naming the service 'redis' and using the chart template found in 'bitnami/redis'. 
+2. Install and create the full manifest for the service using `helm install redis bitnami/redis -f helm-values/redis-values.yaml`. This updates the manifest with any overridden fields found in `redis-values.yaml`. When executing this command, we are naming the service 'redis' and using the manifest template found in 'bitnami/redis'. 
 
-## Bare chart workflow (no helm)
-The charts found in `k8s/` do not rely on helm templates, instead they contain the full definition for the service. In order to add these services to our cluster, we just need to run `kubectl apply -f k8s/<service_name.yaml>`. This will update the cluster with that service. 
+## Kubernetes manifests
+The kubernetes manifests found in `k8s/` provide a full definition for their respective services. In order to add these services to our cluster, we just need to run `kubectl apply -f k8s/<service_name.yaml>`. This will update the cluster with that service. 
 
 For example, running `kubectl apply -f k8s/ingress.yaml` will publish an NGINX ingress service to the cluster, allowing us to access the application externally via https://yopass.radioco.local.
 
